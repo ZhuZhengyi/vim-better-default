@@ -3,15 +3,14 @@
 " Version:      1.0
 " vim: et ts=2 sts=2 sw=2
 
-scriptencoding utf-8
 
 if &compatible || exists('g:loaded_vim_better_default')
    finish
 endif
 let g:loaded_vim_better_default = 1
 
-let s:save_cpo = &cpo
-set cpo&vim
+let s:save_cpo = &cpoptions
+set cpoptions&vim
 
 " Neovim has set these as default
 if !has('nvim')
@@ -33,28 +32,42 @@ if !has('nvim')
   set mouse=a                    " Automatically enable mouse usage
   set smarttab                   " Smart tab
   set ttyfast                    " Faster redrawing
-  set viminfo+=!                 " Viminfo include !
   set wildmenu                   " Show list instead of just completing
-
+  set nobackup                   " No backup
+  set modeline
   set ttymouse=xterm2
-
+  if !has('nvim')
+    set viminfo='100,n$HOME/.vim/files/info/viminfo
+  endif
 endif
 
+augroup detect
+    au FileType html,markdown set tabstop=2
+    au FileType html,markdown set shiftwidth=2
+augroup END
+
+scriptencoding utf-8
+
 set shortmess=atOI " No help Uganda information, and overwrite read messages to avoid PRESS ENTER prompts
+set smartindent                " Smart indent
 set ignorecase     " Case insensitive search
 set smartcase      " ... but case sensitive when uc present
 set scrolljump=5   " Line to scroll when cursor leaves screen
 set scrolloff=3    " Minumum lines to keep above and below cursor
 set nowrap         " Do not wrap long lines
+set backspace=2                     "
 set shiftwidth=4   " Use indents of 4 spaces
 set tabstop=4      " An indentation every four columns
 set softtabstop=4  " Let backspace delete indent
+set cindent shiftwidth=4            "
+set cmdheight=2                     " 命令行高度
+set laststatus=2                    " 开启状态栏
 set splitright     " Puts new vsplit windows to the right of the current
 set splitbelow     " Puts new split windows to the bottom of the current
 set autowrite      " Automatically write a file when leaving a modified buffer
 set mousehide      " Hide the mouse cursor while typing
 set hidden         " Allow buffer switching without saving
-set t_Co=256       " Use 256 colors
+"set t_Co=256       " Use 256 colors
 set ruler          " Show the ruler
 set showcmd        " Show partial commands in status line and Selected characters/lines in visual mode
 set showmode       " Show current mode in command-line
@@ -68,32 +81,51 @@ if !exists('g:vim_better_default_tabs_as_spaces') || g:vim_better_default_tabs_a
   set expandtab    " Tabs are spaces, not tabs
 end
 
+"set guifont=monaco\ 10              " 默认字体
+set guifont=source\ code\ pro              " 默认字体
+if has('win32') && has('gui_running')
+    language message zh_CN.UTF-8
+    set background=light            "设置主题整体为暗色调
+endif
+
+if !has('gui_running')
+  set t_Co=256
+endif
+
+"恢复上次光标位置
+if has('autocmd')
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
 " http://stackoverflow.com/questions/6427650/vim-in-tmux-background-color-changes-when-paging/15095377#15095377
 set t_ut=
 
 set winminheight=0
 set wildmode=list:longest,full
 
-set listchars=tab:→\ ,eol:↵,trail:·,extends:↷,precedes:↶
+"set listchars=tab:→\ ,eol:↵,trail:·,extends:↷,precedes:↶
 
 set whichwrap+=<,>,h,l  " Allow backspace and cursor keys to cross line boundaries
 
 set termencoding=utf-8
 set fileencoding=utf-8
-set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set fileencodings=utf-8,ucs-bom,chinese,cp936,gb18030,gbk,gb2312,big5,latin1
 
-set wildignore+=*swp,*.class,*.pyc,*.png,*.jpg,*.gif,*.zip
+set wildignore+=*swp,*.class,*.pyc,*.png,*.jpg,*.gif,*.zip,*.un~
 set wildignore+=*/tmp/*,*.o,*.obj,*.so     " Unix
 set wildignore+=*\\tmp\\*,*.exe            " Windows
 
 " Visual shifting (does not exit Visual mode)
 vnoremap < <gv
 vnoremap > >gv
+
 " Treat long lines as break lines (useful when moving around in them)
 nmap j gj
 nmap k gk
-vmap j gj
-vmap k gk
+"vmap j gj
+"vmap k gk
+
+nnoremap <leader>* :nohl<CR>
 
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
@@ -137,7 +169,8 @@ if get(g:, 'vim_better_default_enable_folding', 1)
   set foldenable
   set foldmarker={,}
   set foldlevel=0
-  set foldmethod=marker
+  set foldmethod=syntax
+  au FileType python set foldmethod=marker
   " set foldcolumn=3
   set foldlevelstart=99
 endif
@@ -145,6 +178,7 @@ endif
 set background=dark         " Assume dark background
 set cursorline              " Highlight current line
 set fileformats=unix,dos,mac        " Use Unix as the standard file type
+set fileformat=unix                 " 默认文本格式
 set number                  " Line numbers on
 set relativenumber          " Relative numbers on
 set fillchars=stl:\ ,stlnc:\ ,fold:\ ,vert:│
@@ -161,12 +195,13 @@ highlight clear SignColumn  " SignColumn should match background
 
 if has('unnamedplus')
   set clipboard=unnamedplus,unnamed
-else
+elseif $TMUX == ''
   set clipboard+=unnamed
 endif
 
 if get(g:, 'vim_better_default_persistent_undo', 0)
   if has('persistent_undo')
+    set undodir=~/.undodir
     set undofile             " Persistent undo
     set undolevels=1000      " Maximum number of changes that can be undone
     set undoreload=10000     " Maximum number lines to save for undo on a buffer reload
@@ -222,7 +257,7 @@ endif
         inoremap jj <Esc>
         cnoremap jj <C-c>
         " Quit visual mode
-        vnoremap v <Esc>
+        "vnoremap v <Esc>
         " Move to the start of line
         nnoremap H ^
         " Move to the end of line
@@ -310,12 +345,37 @@ endif
         nnoremap <Leader>wv <C-W>v
         nnoremap <Leader>w\| <C-W>v
         nnoremap <Leader>w2 <C-W>v
+        nnoremap <C-h> <C-W>h
+        nnoremap <C-j> <C-W>j
+        nnoremap <C-k> <C-W>k
+        nnoremap <C-l> <C-W>l
       endif
     " }
+
+    function! Zoom ()
+      " check if is the zoomed state (tabnumber > 1 && window == 1)
+      if tabpagenr('$') > 1 && tabpagewinnr(tabpagenr(), '$') == 1
+        let l:cur_winview = winsaveview()
+        let l:cur_bufname = bufname('')
+        tabclose
+        " restore the view
+        if l:cur_bufname == bufname('')
+          call winrestview(cur_winview)
+        endif
+      else
+        tab split
+      endif
+    endfunction
+    nnoremap <leader>z :call Zoom()<CR>
 
   endif
 
 " }
 
+autocmd BufWritePost $MYVIMRC source $MYVIMRC
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
+
+
+
