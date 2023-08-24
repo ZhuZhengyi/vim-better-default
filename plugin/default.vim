@@ -176,8 +176,8 @@ if get(g:, 'vim_better_default_enable_folding', 1)
 endif
 
 set background=dark         " Assume dark background
-set cursorline              " Highlight current line
-au Filetype * highlight cursorline ctermbg=Black
+"set cursorline              " Highlight current line
+"au Filetype * highlight cursorline ctermbg=Black
 set fileformats=unix,dos,mac        " Use Unix as the standard file type
 set fileformat=unix                 " 默认文本格式
 set number                  " Line numbers on
