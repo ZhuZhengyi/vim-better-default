@@ -42,8 +42,8 @@ if !has('nvim')
 endif
 
 augroup detect
-    au FileType html,markdown set tabstop=2
-    au FileType html,markdown set shiftwidth=2
+    au FileType html,vue,markdown set tabstop=2
+    au FileType html,vue,markdown set shiftwidth=2
 augroup END
 
 scriptencoding utf-8
@@ -82,7 +82,9 @@ if !exists('g:vim_better_default_tabs_as_spaces') || g:vim_better_default_tabs_a
 end
 
 "set guifont=monaco\ 10              " 默认字体
-set guifont=source\ code\ pro              " 默认字体
+"set guifont=Monaco\ Nerd\ Font\ Mono              " 默认字体
+"set guifont=SauceCodePro\ Nerd\ Font\ Mono              " 默认字体
+set guifont=ComicShannsMono\ Nerd\ Font\ Mono             " 默认字体
 if has('win32') && has('gui_running')
     language message zh_CN.UTF-8
     set background=light            "设置主题整体为暗色调
