@@ -122,8 +122,8 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Treat long lines as break lines (useful when moving around in them)
-nmap j gj
-nmap k gk
+nnoremap j gj
+nnoremap k gk
 "vmap j gj
 "vmap k gk
 
